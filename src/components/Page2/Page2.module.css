@@ -1,0 +1,6 @@
+.main_body {
+    padding: 0% 5%;
+    overflow-x: scroll;
+    scrollbar-width: none;
+    height: calc(100% - 64px);
+}
