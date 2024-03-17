@@ -11,7 +11,7 @@ let options = ["Africa", "America", "Asia", "Europe", "Oceania"];
 
 
 
-export default function Content({ }) {
+export default function Content({ setData }) {
     const navigate = useNavigate();
     const [myData, setMyData] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -32,7 +32,6 @@ export default function Content({ }) {
         try {
             loadingUpdate(true);
             const res = await axios.get("/all");
-            console.log(res.data)
             setMyData(res.data);
             loadingUpdate(false);
         } catch (error) {
@@ -46,30 +45,32 @@ export default function Content({ }) {
 
     useEffect(() => {
         try {
-            if (regionValue !== "") {
-                const debounce = setTimeout(async () => {
-
+            const debounce = setTimeout(async () => {
+                try {
                     if (searchRef.current === null || searchRef.current !== regionValue) {
                         searchRef.current = regionValue;
 
                         if (regionValue) {
                             loadingUpdate(true);
                             const res = await axios.get(`/region/${regionValue?.toLowerCase()}`);
-                            loadingUpdate(false);
+
                             setMyData(res.data);
                         }
                     }
-                }, 300);
-
-                return () => {
-                    clearTimeout(debounce);
+                } catch (error) {
+                    console.log(error);
                 }
-            }
-            else {
-                getAllData();
-            }
+                finally {
+                    loadingUpdate(false);
+                }
 
-        } catch (error) {
+            }, 300);
+
+            return () => {
+                clearTimeout(debounce);
+            }
+        }
+        catch (error) {
             console.log(error.message);
             loadingUpdate(false);
         }
@@ -79,30 +80,26 @@ export default function Content({ }) {
 
     useEffect(() => {
         try {
-            if (searchValue !== "") {
-                const debounce = setTimeout(async () => {
-                    if (searchRef.current === null || searchRef.current !== searchValue) {
-                        try {
-                            searchRef.current = searchValue;
-                            loadingUpdate(true);
-                            const res = await axios.get(`/name/${searchValue}`);
+            const debounce = setTimeout(async () => {
+                if (searchRef.current === null || searchRef.current !== searchValue) {
+                    try {
+                        searchRef.current = searchValue;
+                        loadingUpdate(true);
+                        const res = await axios.get(`/name/${searchValue}`);
 
-                            setMyData(res.data);
-                        } catch (error) {
-                            console.log("Not found---------------->", error.message);
-                        } finally {
-                            loadingUpdate(false);
-                        }
+                        setMyData(res.data);
+                    } catch (error) {
+                        console.log("Not found---------------->", error.message);
+                    } finally {
+                        loadingUpdate(false);
                     }
-                }, 300);
-
-                return () => {
-                    clearTimeout(debounce);
                 }
+            }, 300);
+
+            return () => {
+                clearTimeout(debounce);
             }
-            else {
-                getAllData();
-            }
+
         } catch (error) {
             console.log(error.message);
             loadingUpdate(false);
@@ -110,7 +107,7 @@ export default function Content({ }) {
 
     }, [searchValue])
 
-    console.log("isLoading======++++++++>", isLoading)
+
     return (
         <Box sx={{ bgcolor: "primary.dark", scrollbarWidth: "none", overflowX: "scroll", padding: "0 5%", height: "calc(100% - 64px)" }}>
             <Filter value={searchValue} setValue={setSearchValue} regionValue={regionValue} setRegionValue={setRegionValue} options={options} />
@@ -119,13 +116,13 @@ export default function Content({ }) {
                     <Grid container rowSpacing={2} spacing={2}>
                         {
                             myData?.map((obj, index) => {
-                                return <Grid key={index} item xs={12} md={3} onClick={() => {
+                                return <Grid data-testid={`card${index}`} key={index} item xs={12} md={3} onClick={() => {
 
                                     navigate('/country');
                                     setData(obj)
                                 }}>
                                     <Cards
-                                        data-testid={`card${index}`}
+
                                         name={obj?.name?.official} population={obj?.population} region={obj?.region} capitalArr={obj?.capital} img={obj?.flags?.svg} />
                                 </Grid>
                             })

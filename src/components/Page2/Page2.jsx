@@ -75,7 +75,7 @@ export default function Page2({ data, setData }) {
     const handleButtonClick2 = async (code) => {
         try {
             const res = await axios.get(`/alpha?codes=${code?.toLowerCase()}`);
-            // console.log(res);
+
             setData(res.data[0]);
 
         } catch (error) {
@@ -93,7 +93,7 @@ export default function Page2({ data, setData }) {
 
         <Box sx={{ bgcolor: "primary.dark" }} className={`${styles.main_body}`}>
             <Box sx={{ margin: "2% 0%" }}>
-                <Button variant="contained" startIcon={<WestIcon />} onClick={handleButtonClick}>Back</Button>
+                <Button data-testid="backBtn" variant="contained" startIcon={<WestIcon />} onClick={handleButtonClick}>Back</Button>
             </Box>
             <Stack direction={{ xs: 'column', md: 'row' }} spacing={5}>
                 <Box sx={{ flex: 2 }}>
@@ -139,7 +139,7 @@ export default function Page2({ data, setData }) {
                             </Typography>
                             {
                                 findName(data?.borders)?.map((name, index) => {
-                                    return <Button key={index} onClick={() => handleButtonClick2(name)} variant="contained" sx={{ margin: "0 5px" }}>{name}</Button>
+                                    return <Button data-testid={`borderbtn${index}`} key={index} onClick={() => handleButtonClick2(name)} variant="contained" sx={{ margin: "0 5px" }}>{name}</Button>
                                 })
                             }
                         </Box>

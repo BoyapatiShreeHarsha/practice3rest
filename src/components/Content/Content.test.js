@@ -1,13 +1,23 @@
 import React from "react";
 import Cards from '../Card/Cards';
-import Filter from '../Filter/Filter'
 import mockAxios from "../../__mocks__/mockAxios";
 import { BrowserRouter } from "react-router-dom";
-import { cleanup, render, screen, waitFor, act } from "@testing-library/react";
+import { cleanup, render, screen, waitFor, act, fireEvent, within } from "@testing-library/react";
 import Content from "./Content";
+import _ from 'lodash';
+
+const mockedUsedNavigate = jest.fn();
+jest.mock('react-router-dom', () => ({
+    ...(jest.requireActual('react-router-dom')),
+    useNavigate: () => mockedUsedNavigate,
+}))
 
 jest.mock("../Card/Cards");
-jest.mock("../Filter/Filter");
+
+jest.mock('lodash', () => ({
+    ...jest.requireActual('lodash'),
+    debounce: jest.fn((fn) => fn),
+}))
 
 let allResponseData = [
     {
@@ -444,7 +454,453 @@ let allResponseData = [
         }
     }];
 
-beforeAll(() => {
+let nameResponseData = [
+    {
+        "name": {
+            "common": "Belgium",
+            "official": "Kingdom of Belgium",
+            "nativeName": {
+                "deu": {
+                    "official": "Königreich Belgien",
+                    "common": "Belgien"
+                },
+                "fra": {
+                    "official": "Royaume de Belgique",
+                    "common": "Belgique"
+                },
+                "nld": {
+                    "official": "Koninkrijk België",
+                    "common": "België"
+                }
+            }
+        },
+        "tld": [
+            ".be"
+        ],
+        "cca2": "BE",
+        "ccn3": "056",
+        "cca3": "BEL",
+        "cioc": "BEL",
+        "independent": true,
+        "status": "officially-assigned",
+        "unMember": true,
+        "currencies": {
+            "EUR": {
+                "name": "Euro",
+                "symbol": "€"
+            }
+        },
+        "idd": {
+            "root": "+3",
+            "suffixes": [
+                "2"
+            ]
+        },
+        "capital": [
+            "Brussels"
+        ],
+        "altSpellings": [
+            "BE",
+            "België",
+            "Belgie",
+            "Belgien",
+            "Belgique",
+            "Kingdom of Belgium",
+            "Koninkrijk België",
+            "Royaume de Belgique",
+            "Königreich Belgien"
+        ],
+        "region": "Europe",
+        "subregion": "Western Europe",
+        "languages": {
+            "deu": "German",
+            "fra": "French",
+            "nld": "Dutch"
+        },
+        "translations": {
+            "ara": {
+                "official": "مملكة بلجيكا",
+                "common": "بلجيكا"
+            },
+            "bre": {
+                "official": "Rouantelezh Belgia",
+                "common": "Belgia"
+            },
+            "ces": {
+                "official": "Belgické království",
+                "common": "Belgie"
+            },
+            "cym": {
+                "official": "Teyrnas Gwlad Belg",
+                "common": "Gwlad Belg"
+            },
+            "deu": {
+                "official": "Königreich Belgien",
+                "common": "Belgien"
+            },
+            "est": {
+                "official": "Belgia Kuningriik",
+                "common": "Belgia"
+            },
+            "fin": {
+                "official": "Belgian kuningaskunta",
+                "common": "Belgia"
+            },
+            "fra": {
+                "official": "Royaume de Belgique",
+                "common": "Belgique"
+            },
+            "hrv": {
+                "official": "Kraljevina Belgija",
+                "common": "Belgija"
+            },
+            "hun": {
+                "official": "Belga Királyság",
+                "common": "Belgium"
+            },
+            "ita": {
+                "official": "Regno del Belgio",
+                "common": "Belgio"
+            },
+            "jpn": {
+                "official": "ベルギー王国",
+                "common": "ベルギー"
+            },
+            "kor": {
+                "official": "벨기에 왕국",
+                "common": "벨기에"
+            },
+            "nld": {
+                "official": "Koninkrijk België",
+                "common": "België"
+            },
+            "per": {
+                "official": "پادشاهی بلژیک",
+                "common": "بلژیک"
+            },
+            "pol": {
+                "official": "Królestwo Belgii",
+                "common": "Belgia"
+            },
+            "por": {
+                "official": "Reino da Bélgica",
+                "common": "Bélgica"
+            },
+            "rus": {
+                "official": "Королевство Бельгия",
+                "common": "Бельгия"
+            },
+            "slk": {
+                "official": "Belgické kráľovstvo",
+                "common": "Belgicko"
+            },
+            "spa": {
+                "official": "Reino de Bélgica",
+                "common": "Bélgica"
+            },
+            "srp": {
+                "official": "Краљевина Белгија",
+                "common": "Белгија"
+            },
+            "swe": {
+                "official": "Konungariket Belgien",
+                "common": "Belgien"
+            },
+            "tur": {
+                "official": "Belçika Krallığı",
+                "common": "Belğika"
+            },
+            "urd": {
+                "official": "مملکتِ بلجئیم",
+                "common": "بلجئیم"
+            },
+            "zho": {
+                "official": "比利时王国",
+                "common": "比利时"
+            }
+        },
+        "latlng": [
+            50.83333333,
+            4.0
+        ],
+        "landlocked": false,
+        "borders": [
+            "FRA",
+            "DEU",
+            "LUX",
+            "NLD"
+        ],
+        "area": 30528.0,
+        "demonyms": {
+            "eng": {
+                "f": "Belgian",
+                "m": "Belgian"
+            },
+            "fra": {
+                "f": "Belge",
+                "m": "Belge"
+            }
+        },
+        "flag": "🇧🇪",
+        "maps": {
+            "googleMaps": "https://goo.gl/maps/UQQzat85TCtPRXAL8",
+            "openStreetMaps": "https://www.openstreetmap.org/relation/52411"
+        },
+        "population": 11555997,
+        "gini": {
+            "2018": 27.2
+        },
+        "fifa": "BEL",
+        "car": {
+            "signs": [
+                "B"
+            ],
+            "side": "right"
+        },
+        "timezones": [
+            "UTC+01:00"
+        ],
+        "continents": [
+            "Europe"
+        ],
+        "flags": {
+            "png": "https://flagcdn.com/w320/be.png",
+            "svg": "https://flagcdn.com/be.svg",
+            "alt": "The flag of Belgium is composed of three equal vertical bands of black, yellow and red."
+        },
+        "coatOfArms": {
+            "png": "https://mainfacts.com/media/images/coats_of_arms/be.png",
+            "svg": "https://mainfacts.com/media/images/coats_of_arms/be.svg"
+        },
+        "startOfWeek": "monday",
+        "capitalInfo": {
+            "latlng": [
+                50.83,
+                4.33
+            ]
+        },
+        "postalCode": {
+            "format": "####",
+            "regex": "^(\\d{4})$"
+        }
+    }
+]
+
+let regionResponseData = [
+    {
+        "name": {
+            "common": "Liberia",
+            "official": "Republic of Liberia",
+            "nativeName": {
+                "eng": {
+                    "official": "Republic of Liberia",
+                    "common": "Liberia"
+                }
+            }
+        },
+        "tld": [
+            ".lr"
+        ],
+        "cca2": "LR",
+        "ccn3": "430",
+        "cca3": "LBR",
+        "cioc": "LBR",
+        "independent": true,
+        "status": "officially-assigned",
+        "unMember": true,
+        "currencies": {
+            "LRD": {
+                "name": "Liberian dollar",
+                "symbol": "$"
+            }
+        },
+        "idd": {
+            "root": "+2",
+            "suffixes": [
+                "31"
+            ]
+        },
+        "capital": [
+            "Monrovia"
+        ],
+        "altSpellings": [
+            "LR",
+            "Republic of Liberia"
+        ],
+        "region": "Africa",
+        "subregion": "Western Africa",
+        "languages": {
+            "eng": "English"
+        },
+        "translations": {
+            "ara": {
+                "official": "جمهورية ليبيريا",
+                "common": "ليبيريا"
+            },
+            "bre": {
+                "official": "Republik Liberia",
+                "common": "Liberia"
+            },
+            "ces": {
+                "official": "Liberijská republika",
+                "common": "Libérie"
+            },
+            "cym": {
+                "official": "Republic of Liberia",
+                "common": "Liberia"
+            },
+            "deu": {
+                "official": "Republik Liberia",
+                "common": "Liberia"
+            },
+            "est": {
+                "official": "Libeeria Vabariik",
+                "common": "Libeeria"
+            },
+            "fin": {
+                "official": "Liberian tasavalta",
+                "common": "Liberia"
+            },
+            "fra": {
+                "official": "République du Libéria",
+                "common": "Liberia"
+            },
+            "hrv": {
+                "official": "Republika Liberija",
+                "common": "Liberija"
+            },
+            "hun": {
+                "official": "Libériai Köztársaság",
+                "common": "Libéria"
+            },
+            "ita": {
+                "official": "Repubblica di Liberia",
+                "common": "Liberia"
+            },
+            "jpn": {
+                "official": "リベリア共和国",
+                "common": "リベリア"
+            },
+            "kor": {
+                "official": "라이베리아 공화국",
+                "common": "라이베리아"
+            },
+            "nld": {
+                "official": "Republiek Liberia",
+                "common": "Liberia"
+            },
+            "per": {
+                "official": "جمهوری لیبریا",
+                "common": "لیبـِریا"
+            },
+            "pol": {
+                "official": "Republika Liberii",
+                "common": "Liberia"
+            },
+            "por": {
+                "official": "República da Libéria",
+                "common": "Libéria"
+            },
+            "rus": {
+                "official": "Республика Либерия",
+                "common": "Либерия"
+            },
+            "slk": {
+                "official": "Libérijská republika",
+                "common": "Libéria"
+            },
+            "spa": {
+                "official": "República de Liberia",
+                "common": "Liberia"
+            },
+            "srp": {
+                "official": "Република Либерија",
+                "common": "Либерија"
+            },
+            "swe": {
+                "official": "Republiken Liberia",
+                "common": "Liberia"
+            },
+            "tur": {
+                "official": "Liberya Cumhuriyeti",
+                "common": "Liberya"
+            },
+            "urd": {
+                "official": "جمہوریہ لائبیریا",
+                "common": "لائبیریا"
+            },
+            "zho": {
+                "official": "利比里亚共和国",
+                "common": "利比里亚"
+            }
+        },
+        "latlng": [
+            6.5,
+            -9.5
+        ],
+        "landlocked": false,
+        "borders": [
+            "GIN",
+            "CIV",
+            "SLE"
+        ],
+        "area": 111369.0,
+        "demonyms": {
+            "eng": {
+                "f": "Liberian",
+                "m": "Liberian"
+            },
+            "fra": {
+                "f": "Libérienne",
+                "m": "Libérien"
+            }
+        },
+        "flag": "🇱🇷",
+        "maps": {
+            "googleMaps": "https://goo.gl/maps/4VsHsc2oeGeRL3wg6",
+            "openStreetMaps": "https://www.openstreetmap.org/relation/192780"
+        },
+        "population": 5057677,
+        "gini": {
+            "2016": 35.3
+        },
+        "fifa": "LBR",
+        "car": {
+            "signs": [
+                "LB"
+            ],
+            "side": "right"
+        },
+        "timezones": [
+            "UTC"
+        ],
+        "continents": [
+            "Africa"
+        ],
+        "flags": {
+            "png": "https://flagcdn.com/w320/lr.png",
+            "svg": "https://flagcdn.com/lr.svg",
+            "alt": "The flag of Liberia is composed of eleven equal horizontal bands of red alternating with white. A blue square bearing a five-pointed white star is superimposed in the canton."
+        },
+        "coatOfArms": {
+            "png": "https://mainfacts.com/media/images/coats_of_arms/lr.png",
+            "svg": "https://mainfacts.com/media/images/coats_of_arms/lr.svg"
+        },
+        "startOfWeek": "monday",
+        "capitalInfo": {
+            "latlng": [
+                6.3,
+                -10.8
+            ]
+        },
+        "postalCode": {
+            "format": "####",
+            "regex": "^(\\d{4})$"
+        }
+    }
+]
+
+beforeEach(() => {
     mockAxios.reset();
 });
 
@@ -453,18 +909,72 @@ afterEach(cleanup);
 
 describe("Test for Content component", () => {
     test("checking the all api", async () => {
-        Cards.mockImplementation((name, ...rest) => <div>{name}</div>);
-        // const mockAxios = new MockAdapter(axios);
+
+        Cards.mockImplementation(({ name, ...rest }) => <div>{name}</div>);
         mockAxios.onGet("/all").reply(200, allResponseData);
 
-        await act(async () => {
-            render(<BrowserRouter><Content /></BrowserRouter>);
-        });
+        render(<BrowserRouter><Content /></BrowserRouter>);
 
-        // await waitFor(() => expect(screen.queryByText(/Loading/i)).toBeInTheDocument());
+        await waitFor(() => expect(screen.queryByText(/Loading/i)).toBeInTheDocument());
         await waitFor(() => expect(screen.queryByTestId("card0")).toBeInTheDocument());
 
-        // // Now, the component should be loaded
+        expect(screen.queryByText(/Loading/i)).not.toBeInTheDocument()
         expect(screen.queryByText(/Eritrea/i)).toBeInTheDocument();
     });
+
+    test(" on search we should get the data", async () => {
+
+        Cards.mockImplementation(({ name, ...rest }) => <div>{name}</div>);
+
+        mockAxios.onGet("/name/belgium").reply(200, nameResponseData);
+
+        render(<BrowserRouter><Content /></BrowserRouter>);
+        await act(async () => {
+            const searchBarEle = screen.getByTestId("searchBar");
+            fireEvent.change(searchBarEle, { target: { value: "belgium" } });
+        });
+
+        await waitFor(() => expect(screen.queryByTestId("card0")).toBeInTheDocument());
+        expect(screen.queryByText(/Belgium/i)).toBeInTheDocument();
+
+    });
+
+    test.skip(" on select the autocomplete get the data", async () => {
+
+        Cards.mockImplementation(({ name, ...rest }) => <div>{name}</div>);
+        mockAxios.onGet("/region/africa").reply(200, regionResponseData);
+
+        render(<BrowserRouter><Content /></BrowserRouter>);
+        await act(async () => {
+            const autocomplete = screen.getByTestId('autoComplete');
+
+            const input = screen.getByTestId("autoCompleteInput");
+            autocomplete.focus();
+            fireEvent.change(input, { target: { value: 'africa' } });
+            fireEvent.keyDown(autocomplete, { key: 'Enter' });
+            await waitFor(() => expect(input).toHaveValue('africa'));
+
+        });
+
+        await waitFor(() => expect(screen.queryByTestId("card0")).toBeInTheDocument());
+        expect(screen.queryByText(/Liberia/i)).toBeInTheDocument();
+
+    })
+
+    test(" need to go to /country on clicking card", async () => {
+        Cards.mockImplementation(({ name, ...rest }) => <div>{name}</div>);
+
+        mockAxios.onGet("/all").reply(200, allResponseData);
+
+        let setData = jest.fn();
+
+        render(<BrowserRouter><Content setData={setData} /></BrowserRouter>);
+
+        await waitFor(() => expect(screen.queryByText(/Loading/i)).toBeInTheDocument());
+        await waitFor(() => expect(screen.queryByTestId("card0")).toBeInTheDocument());
+        const cardEle = screen.queryByTestId("card0");
+        fireEvent.click(cardEle);
+        expect(mockedUsedNavigate).toHaveBeenCalledWith("/country");
+
+    })
 });
