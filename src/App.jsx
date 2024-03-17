@@ -11,28 +11,32 @@ import {
   Route
 } from "react-router-dom";
 
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: 'hsl(207, 26%, 17%)',
-      // light: will be calculated from palette.primary.main,
-      // dark: will be calculated from palette.primary.main,
-      // contrastText: will be calculated to contrast with palette.primary.main
-    }
-  },
-});
+
 
 
 
 function App() {
 
   const [data, setData] = useState({});
+  const [smode, setMode] = useState(true);
+
+  const theme = createTheme({
+    palette: {
+      mode: smode ? 'dark' : 'light',
+      primary: {
+        main: smode ? 'hsl(207, 26%, 17%)' : "hsl(0, 0 %, 100 %)",
+        // light: will be calculated from palette.primary.main,
+        // dark: will be calculated from palette.primary.main,
+        // contrastText: will be calculated to contrast with palette.primary.main
+      }
+    },
+  });
 
   return (
 
     <ThemeProvider theme={theme}>
       <Box sx={{ height: "100vh" }}>
-        <Header />
+        <Header setMode={setMode} />
         <Routes>
           <Route path="/" element={<Content setData={setData} />} />
           <Route path="/country" element={<Page2 data={data} setData={setData} />} />

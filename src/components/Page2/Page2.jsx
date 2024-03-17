@@ -6,6 +6,10 @@ import getCountryName from "../helperCountryCode"
 import { useNavigate } from 'react-router-dom';
 import axios from '../axios';
 
+import countryCode from 'i18n-iso-countries';
+import getCName from '../helperCountryCode';
+
+
 
 function findName(arr) {
     try {
@@ -67,6 +71,12 @@ function dataProcessing(arr, data) {
 
 
 export default function Page2({ data, setData }) {
+
+    const getCountryName = (name) => {
+        let value = countryCode.alpha3ToAlpha2(name)
+        value = getCName(value);
+        return value;
+    }
 
     const navigate = useNavigate();
     const handleButtonClick = () => {
@@ -139,7 +149,7 @@ export default function Page2({ data, setData }) {
                             </Typography>
                             {
                                 findName(data?.borders)?.map((name, index) => {
-                                    return <Button data-testid={`borderbtn${index}`} key={index} onClick={() => handleButtonClick2(name)} variant="contained" sx={{ margin: "0 5px" }}>{name}</Button>
+                                    return <Button data-testid={`borderbtn${index}`} key={index} onClick={() => handleButtonClick2(name)} variant="contained" sx={{ margin: "0 5px" }}>{getCountryName(name)}</Button>
                                 })
                             }
                         </Box>

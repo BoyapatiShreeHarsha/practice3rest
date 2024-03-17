@@ -6,7 +6,7 @@ import Filter from '../Filter/Filter';
 import axios from '../axios';
 import { useNavigate } from 'react-router-dom';
 
-let options = ["Africa", "America", "Asia", "Europe", "Oceania"];
+
 
 
 
@@ -110,13 +110,13 @@ export default function Content({ setData }) {
 
     return (
         <Box sx={{ bgcolor: "primary.dark", scrollbarWidth: "none", overflowX: "scroll", padding: "0 5%", height: "calc(100% - 64px)" }}>
-            <Filter value={searchValue} setValue={setSearchValue} regionValue={regionValue} setRegionValue={setRegionValue} options={options} />
+            <Filter value={searchValue} setValue={setSearchValue} regionValue={regionValue} setRegionValue={setRegionValue} />
             {isLoading ? <Typography variant='h3' >Loading</Typography> :
-                <Box sx={{ flexGrow: 1 }}>
+                <Box sx={{ width: "100%", margin: "0 auto" }}>
                     <Grid container rowSpacing={2} spacing={2}>
                         {
                             myData?.map((obj, index) => {
-                                return <Grid data-testid={`card${index}`} key={index} item xs={12} md={3} onClick={() => {
+                                return <Grid data-testid={`card${index}`} key={index} item xs={12} sm={6} md={3} onClick={() => {
 
                                     navigate('/country');
                                     setData(obj)

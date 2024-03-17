@@ -1,39 +1,31 @@
-import { Autocomplete, Box, InputAdornment, TextField, styled, Stack } from '@mui/material'
+import { Autocomplete, Box, InputAdornment, TextField, styled, Stack, useTheme } from '@mui/material'
 import React, { useState } from 'react'
 import SearchIcon from '@mui/icons-material/Search';
 
 
+let regions = ["Africa", "America", "Asia", "Europe", "Oceania"];
 
-const StyledTextFeild = styled(TextField)(({ theme }) => ({
+let styleInput = { bgcolor: "primary.main", color: "primary.contrastText", borderRadius: "6px" }
 
-    '& .MuiInputBase-root': {
-        color: theme.palette.primary.contrastText,
-        bgcolor: theme.palette.primary.light
-    },
-    '& .MuiSvgIcon-root': {
-        color: theme.palette.primary.contrastText
-    },
-
-}));
-
-export default function Filter({ value, setValue, regionValue, setRegionValue, options }) {
-
+export default function Filter({ value, setValue, regionValue, setRegionValue }) {
+    const theme = useTheme();
     return (
-        <Stack direction={{ xs: 'column', md: 'row' }} rowGap={5} sx={{ width: "100%", margin: "5% auto", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <StyledTextFeild id="outlined-search" placeholder='Search for a country' type="search"
-
+        <Stack direction={{ xs: 'column', md: 'row' }} rowGap={5} sx={{ width: "100%", height: "10%", margin: "5% auto", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <TextField id="outlined-search" placeholder='Search for a country' type="search"
+                sx={styleInput}
                 value={value}
                 onChange={(e) => {
                     setValue(pre => e.target.value)
                 }}
                 inputProps={{
-                    "data-testid": "searchBar"
+                    "data-testid": "searchBar",
+                    "sx": styleInput
                 }
                 }
                 InputProps={{
                     startAdornment: (
                         <InputAdornment position='start'>
-                            <SearchIcon />
+                            <SearchIcon style={{ color: (theme.palette.mode === 'dark') ? "white" : "black" }} />
                         </InputAdornment>
                     )
                 }}
@@ -47,11 +39,9 @@ export default function Filter({ value, setValue, regionValue, setRegionValue, o
                 }}
                 disablePortal
                 id="combo-box-demo"
-                options={options}
-                sx={{ width: 300, bgcolor: "primary.main", color: "primary.contrastText" }}
-                renderInput={(params) => <TextField {...params} sx={{ bgcolor: "primary.main", color: "primary.contrastText" }} inputProps={{
-                    "data-testid": "autoCompleteInput"
-                }} placeholder='Filter By Region' />}
+                options={regions}
+                sx={{ width: 300, ...styleInput }}
+                renderInput={(params) => <TextField {...params} placeholder="Filter By Region" />}
             />
         </Stack>
     )

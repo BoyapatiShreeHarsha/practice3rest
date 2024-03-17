@@ -7,7 +7,8 @@ import Button from "@mui/material/Button";
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 
 
-export default function Header() {
+export default function Header({ setMode }) {
+
     return (
         <Box sx={{ flexGrow: 1 }}>
             <AppBar
@@ -18,7 +19,9 @@ export default function Header() {
                     <Typography variant="h6" component="div" sx={{ flexGrow: 1 }} data-testid="header">
                         Where in the world?
                     </Typography>
-                    <Button color="inherit" variant="text" startIcon={<DarkModeIcon />}>Dark Mode</Button>
+                    <Button color="inherit" variant="text" onClick={() => {
+                        setMode(prev => !prev)
+                    }} startIcon={<DarkModeIcon />}>Dark Mode</Button>
                 </Toolbar>
             </AppBar>
         </Box>
